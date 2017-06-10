@@ -193,7 +193,7 @@ bool inicializaNode(Node *node){
 	node->prox = NULL;
 	node->positions = (Fila *) malloc(sizeof(Fila *));
 	inicializaFila(node->positions);
-	printf("Node criado com sucesso");
+	printf("Node criado com sucesso\n");
 	return 1;
 	
 }
@@ -239,6 +239,7 @@ bool insereNaTrieRecursivo(int *palavraTraduzida, int i, int length, int positio
 			Node *novoNode = (Node *) malloc(sizeof(Node));
 			inicializaNode(novoNode);
 			novoNode->conteudo = palavraTraduzida[i];
+			printf("Conteúdo: %d", palavraTraduzida[i]);
 			pai->filho = novoNode;
 			
 			trie->altura++;
@@ -335,10 +336,11 @@ bool insereNaTrie(char* palavra, int length, int position, Trie *trie){
 	}
 	// Traduz a palavra em números
 	int i;
-	int palavraTraduzida[length];
+	int *palavraTraduzida = (int *) malloc (length * sizeof(int));
 	for(i=0; i<length; i++){
 		palavraTraduzida[i] = charToInt(palavra[i]);
 	}
+	
 	// Seta como primeiro pai a raiz
 	Node *pai = trie->raiz;
 	i = 0;
@@ -359,6 +361,6 @@ int getNElementosTrie(Trie *trie){
 void main(void){
 	Trie *trie = (Trie *) malloc(sizeof(Trie));
 	inicializaTrie(trie);
-	bool resultado = insereNaTrie("teste", 0, 5, trie);
+	bool resultado = insereNaTrie("teste", 5, 0, trie);
 	//printf("Resultado: %d | n_elementos: %d | Altura: %d", resultado, getNElementosTrie(trie), getAlturaTrie(trie));
 }
