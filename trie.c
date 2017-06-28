@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <string.h>
 
 // -------------- Implementação da fila -----------------------
 
@@ -148,6 +149,7 @@ typedef struct {
 	Node * raiz;
 	int n_elementos;
 	int altura;
+	int currentPosition;
 } Trie;
 
 // Converte uma letra para um número
@@ -197,9 +199,10 @@ bool inicializaNode(Node *node){
 	return 1;
 	
 }
+
 bool inicializaTrie(Trie *trie){
 	// Cria a raiz
-	trie->raiz = (Node*) malloc(sizeof(Node));	
+	trie->raiz = (Node*) malloc(sizeof(Node));
 	
 	// Inicializa a raiz
 	inicializaNode(trie->raiz);
@@ -224,6 +227,32 @@ bool checaInicializacaoTrie(Trie *trie){
 	return 1;
 }
 
+
+int buscaNaTrieRecursivo(Trie *trie, Node* pai, Node *encontrado, int *palavraTraduzida, int i, int length){
+	
+}
+
+
+int buscaNaTrie(Trie *trie, char* valor, Node *encontrado){
+	if(!checaInicializacaoTrie(trie)){
+		return 0;
+	}
+	
+	int length = strlen(valor);
+	
+	// Traduz a palavra em números
+	int i;
+	int *palavraTraduzida = (int *) malloc (length * sizeof(int));
+	for(i=0; i<length; i++){
+		palavraTraduzida[i] = charToInt(palavra[i]);
+	}
+	
+	i = 0;
+	buscaNaTrieRecursivo(trie, trie->raiz, encontrado, palavraTraduzida, i, length);
+}
+
+
+/*
 bool insereNaTrieRecursivo(int *palavraTraduzida, int i, int length, int position, Node* pai, Trie *trie){
 	Node *atual = pai->filho;
 	// Se o node não tem filhos (node novo)
@@ -346,6 +375,8 @@ bool insereNaTrie(char* palavra, int length, int position, Trie *trie){
 	i = 0;
 	insereNaTrieRecursivo(palavraTraduzida, i, length, position, pai, trie);
 }
+*/
+
 
 int getAlturaTrie(Trie *trie){
 	return trie->altura;
