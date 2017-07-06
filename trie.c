@@ -278,7 +278,7 @@ Node *buscaNaTrieRecursivo(Trie *trie, Node* pai, int *palavraTraduzida, int i, 
 			atual = atual->prox;
 		}
 	}
-	//printf("%d\n", -1);
+	printf("%d\n", -1);
 	return NULL;	
 }
 
@@ -444,68 +444,9 @@ bool insereNaTrie(Trie *trie, char* palavra){
 
 
 
-Node *buscaMultiplaDoUsuario(Trie *trie, char *palavra){
-	Node *encontrado = buscaNaTrie(trie, palavra);
-	
-	if(!encontrado){
-		Node *tmp = (Node *) malloc(sizeof(Node));
-		inicializaNode(tmp);
-		tmp->conteudo = -1;
-		return tmp;
-	}
-	if(!filaChecaInicializacao(encontrado->positions)){
-		return NULL;
-	}
-	//mostraFila(encontrado->positions);
-	
-	//int length = encontrado->positions->nElementos;
-	
-	/*
-	if(length == 0){
-		printf("%d\n", -1);
-		return 0;
-	}
-	
-	
-	int *elementos = (int *) malloc(sizeof(int) * length);
-	getFilaInteira(elementos, encontrado->positions);
-	
-	
-	int i;
-	for(i=0; i<length; i++){
-		if(i < length-1){
-			printf("%d ", elementos[i]);
-		} else {
-			printf("%d\n", elementos[i]);
-		}
-	}
-	return 1;
-	*/
-	return encontrado;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 int main(){
-	
 	int nTexts[1];
 	scanf("%d%*c", nTexts);
 	
@@ -540,101 +481,12 @@ int main(){
 		palavraPesquisa = strtok (search, " ");
 		while (palavraPesquisa != NULL)
 		{
-			Node *tmp = buscaMultiplaDoUsuario(trie, palavraPesquisa);
-			if(tmp){
-				int length = tmp->positions->nElementos;
-			
-				if(length == 0){
-					elementos = (int *) malloc(sizeof(int));
-					elementos[0] = -1;
-					//int elementos[1] = {-1};
-					tamanhos[i] = 1;
-					resultados[i] = elementos;
-				}else{
-					elementos = (int *) malloc(sizeof(int) * length);
-					//int elementos[length];
-					getFilaInteira(elementos, tmp->positions);
-					
-					for(j=0; j<length; j++){
-						printf("Teste %d\n", j);
-						printf("%d\n", elementos[j]);
-					}
-					
-					resultados[i] = elementos;
-					tamanhos[i] = length;
-				}
-			} else {
-				printf("Testeeeee\n");
-				elementos = (int *) malloc(sizeof(int));
-				elementos[0] = -1;
-				//int elementos[1] = {-1};
-				tamanhos[i] = 1;
-				resultados[i] = elementos;
-			}
+			buscaDoUsuario(trie, palavraPesquisa);
 			palavraPesquisa = strtok (NULL, " ");
 		}
-		free(elementos);
 	}
-	
-
-	int tamanho;
-	for(i=0; i<nTextos; i++){
-		for(j=0; j<tamanhos[i]; j++){
-			printf("[%d][%d]%d ", i, j, resultados[i][j]);
-		}
-	}
-	
 	
 	/*
-	
-	
-	Trie *trie = (Trie *) malloc(sizeof(Trie));
-	inicializaTrie(trie);	
-	
-	char text[10000];
-	////printf("Enter the text:\n");
-	scanf("%[^\n]%*c", text);
-	
-	int nWords[1];
-	////printf("Enter the number of words\n");
-	scanf("%d%*c", nWords);
-	
-	char searchTerms[50 * nWords[0]];
-	////printf("Enter the search terms\n");
-	scanf("%[^\n]%*c", searchTerms);
-	
-	//char *text = "see a bear sell stock see a bull buy stock bid stock bid stock hear the bell stop";
-	
-	
-	////printf("%s\n", text);
-	////printf("\n");
-	////printf("%d\n", nWords[0]);
-	////printf("\n");
-	////printf("%s\n", searchTerms);
-	////printf("\n");
-	
-	char *palavra;
-	palavra = strtok (text, " ");
-	while (palavra != NULL)
-	{
-		//printf ("Inserindo %s\n", palavra);
-		insereNaTrie(trie, palavra);
-		palavra = strtok (NULL, " ");
-	}
-	
-	
-	mostraTrie(trie);
-	
-	char *palavraDeBusca;
-	palavraDeBusca = strtok (searchTerms, " ");
-	while (palavraDeBusca != NULL)
-	{
-		//printf ("Buscando %s\n", palavraDeBusca);
-		buscaDoUsuario(trie, palavraDeBusca);
-		palavraDeBusca = strtok (NULL, " ");
-	}
-	
-
 	
 	
 	bool resultado1 = insereNaTrie(trie, "teste", 5, 0);
