@@ -36,7 +36,7 @@ bool filaChecaInicializacao(Fila *fila){
 	if(fila){
 		return 1;
 	}
-	printf("Essa fila não está inicializada\n");
+	////printf("Essa fila não está inicializada\n");
 	return 0;
 }
 
@@ -54,7 +54,7 @@ int inserirNaFila(int elemento, Fila *fila){
 	if(filaChecaInicializacao){
 		No *novoNo = (No *) malloc(sizeof(No));
 		if(!novoNo){
-			printf("inserirNaFila: Não foi possivel alocar memória para o novoNó\n");
+			////printf("inserirNaFila: Não foi possivel alocar memória para o novoNó\n");
 			return -2;
 		}
 		novoNo->valor = elemento;
@@ -90,7 +90,7 @@ int removerDaFila(Fila *fila){
 			fila->nElementos--;
 			return valor;
 		}
-		printf("removerDaFila: Não foi possível remover da fila - fila vazia\n");
+		////printf("removerDaFila: Não foi possível remover da fila - fila vazia\n");
 		return -3;
 	}
 	return -1;
@@ -98,19 +98,19 @@ int removerDaFila(Fila *fila){
 
 void mostraFila(Fila *fila){
 	if(filaChecaInicializacao){
-		//printf("filaVaria(fila)=%d\n", filaVazia(fila));
+		////printf("filaVaria(fila)=%d\n", filaVazia(fila));
 		if(filaVazia(fila) == 0){
 			No *no = fila->inicio;
-			printf("nElementos: %d | ", fila->nElementos);
-			printf("Conteúdo da fila:");
+			////printf("nElementos: %d | ", fila->nElementos);
+			////printf("Conteúdo da fila:");
 			while(no){
-				printf(" %d", no->valor);
+				////printf(" %d", no->valor);
 				no = no->anterior;
 			}
-			printf("\n");
+			////printf("\n");
 			return;
 		}
-		printf("mostraFila: A fila está vazia\n");
+		////printf("mostraFila: A fila está vazia\n");
 		return;
 	}
 	return;
@@ -121,7 +121,7 @@ void getFilaInteira(int *valores, Fila *fila){
 	No *atual = fila->inicio;
 	for(i=0; i<fila->nElementos; i++){
 		valores[i] = atual->valor;
-		atual = atual->prox;
+		atual = atual->anterior;
 	}	 
 }
 // -------------- Implementação da fila -----------------------
@@ -195,7 +195,7 @@ bool inicializaNode(Node *node){
 	node->prox = NULL;
 	node->positions = (Fila *) malloc(sizeof(Fila *));
 	inicializaFila(node->positions);
-	printf("Node criado com sucesso\n");
+	////printf("Node criado com sucesso\n");
 	return 1;
 	
 }
@@ -210,7 +210,8 @@ bool inicializaTrie(Trie *trie){
 	// Inicializa valores internos da Trie
 	trie->n_elementos = 0;
 	trie->altura = 0;
-	printf("Trie criada com sucesso\n");
+	trie->currentPosition = 0;
+	////printf("Trie criada com sucesso\n");
 	return 1;
 }
 
@@ -227,13 +228,61 @@ bool checaInicializacaoTrie(Trie *trie){
 	return 1;
 }
 
-
-int buscaNaTrieRecursivo(Trie *trie, Node* pai, Node *encontrado, int *palavraTraduzida, int i, int length){
+void mostraTrieRecursivo(Node *node, int i){
+	if(!node){
+		return;
+	}
+	char *conteudo = (char *) malloc(sizeof(char));
+	conteudo[0] = intToChar(node->conteudo);
 	
+	int j;
+	for(j=0; j<i; j++){
+		//printf("\t");
+	}	
+	//printf("%s\n", conteudo);
+	//printf("%d\n", node->conteudo);
+	mostraTrieRecursivo(node->filho, i+1);
+	mostraTrieRecursivo(node->prox, i);
+	
+	return;
+}
+
+void mostraTrie(Trie *trie){
+	if(checaInicializacaoTrie(trie)){
+		mostraTrieRecursivo(trie->raiz, 0);
+		return;
+	}
+	//printf("Trie não inicializada\n");
+	return;
 }
 
 
-int buscaNaTrie(Trie *trie, char* valor, Node *encontrado){
+Node *buscaNaTrieRecursivo(Trie *trie, Node* pai, int *palavraTraduzida, int i, int length){
+	Node *atual = pai->filho;
+	while(atual){
+		//printf("atual->conteudo = %d | palavraTraduzida[i] = %d\n", atual->conteudo, palavraTraduzida[i]);
+		////printf("atual->conteudo = %d\n", atual->conteudo);
+		////printf("palavraTraduzida[i] = %d\n", palavraTraduzida[i]);
+		if(atual->conteudo == palavraTraduzida[i]){
+			//printf("Entrou");
+			//printf("i = %d\n", i);
+			//printf("length-1 = %d\n", length-1);
+			if(i == length - 1){
+				//printf("Final\n");
+				return atual;
+			} else {
+				pai = atual;
+				return buscaNaTrieRecursivo(trie, pai, palavraTraduzida, i+1, length);	
+			}
+		} else {
+			atual = atual->prox;
+		}
+	}
+	//printf("%d\n", -1);
+	return NULL;	
+}
+
+Node *buscaNaTrie(Trie *trie, char* valor){
 	if(!checaInicializacaoTrie(trie)){
 		return 0;
 	}
@@ -244,125 +293,138 @@ int buscaNaTrie(Trie *trie, char* valor, Node *encontrado){
 	int i;
 	int *palavraTraduzida = (int *) malloc (length * sizeof(int));
 	for(i=0; i<length; i++){
-		palavraTraduzida[i] = charToInt(palavra[i]);
+		palavraTraduzida[i] = charToInt(valor[i]);
 	}
 	
 	i = 0;
-	buscaNaTrieRecursivo(trie, trie->raiz, encontrado, palavraTraduzida, i, length);
+	return buscaNaTrieRecursivo(trie, trie->raiz, palavraTraduzida, i, length);
+}
+
+int buscaDoUsuario(Trie *trie, char *palavra){
+	Node *encontrado = buscaNaTrie(trie, palavra);
+	
+	if(!encontrado){
+		return -1;
+	}
+	if(!filaChecaInicializacao(encontrado->positions)){
+		return -1;
+	}
+	//mostraFila(encontrado->positions);
+	
+	int length = encontrado->positions->nElementos;
+	
+	if(length == 0){
+		printf("%d\n", -1);
+		return 0;
+	}
+	
+	int *elementos = (int *) malloc(sizeof(int) * length);
+	getFilaInteira(elementos, encontrado->positions);
+	
+	int i;
+	for(i=0; i<length; i++){
+		if(i < length-1){
+			printf("%d ", elementos[i]);
+		} else {
+			printf("%d\n", elementos[i]);
+		}
+	}
+	return 1;
 }
 
 
-/*
-bool insereNaTrieRecursivo(int *palavraTraduzida, int i, int length, int position, Node* pai, Trie *trie){
+bool insereNaTrieRecursivo(Trie *trie, Node* pai, int *palavraTraduzida, int i, int length, int position){
 	Node *atual = pai->filho;
-	// Se o node não tem filhos (node novo)
-	if(!atual){
-		// Se o pai for o final da palavra
-		if(i == length-1 && pai->conteudo == palavraTraduzida[i]){
-			// Insere no node atual a posição
-			inserirNaFila(position, pai->positions);
-			trie->n_elementos++;
+	if(atual == NULL){
+		//printf("Caso 1\n");
+		Node *novoNode = (Node *) malloc(sizeof(Node));
+		inicializaNode(novoNode);
+		novoNode->conteudo = palavraTraduzida[i];
+		pai->filho = novoNode;
+		trie->altura++;
+		trie->n_elementos++;
+		
+		//printf("i = %d\n", i);
+		//printf("length-1 = %d\n", length-1);
+		if(i == length-1){
+			inserirNaFila(position, novoNode->positions);
 			return 1;
-		// Se o pai não for o final da palavra
 		} else {
-			Node *novoNode = (Node *) malloc(sizeof(Node));
-			inicializaNode(novoNode);
-			novoNode->conteudo = palavraTraduzida[i];
-			printf("Conteúdo: %d", palavraTraduzida[i]);
-			pai->filho = novoNode;
-			
-			trie->altura++;
-			
-			if(i == length-1){
-				inserirNaFila(position, novoNode->positions);
-				return 1;
-			} else {
-				pai = pai->filho;
-				i++;
-				return insereNaTrieRecursivo(palavraTraduzida, i, length, position, pai, trie);
-			}
+			return insereNaTrieRecursivo(trie, novoNode, palavraTraduzida, i+1, length, position);
 		}
 	} else {
 		while(atual){
-			// Se acharmos o conteudo que queremos
+			//printf("atual->conteudo = %d | palavraTraduzida[i] = %d\n", atual->conteudo, palavraTraduzida[i]);
 			if(atual->conteudo == palavraTraduzida[i]){
-				// Se estivermos na última letra
-				if(i == length-1){
-					// Insere no node atual a posição
+				//printf("atual->conteudo == palavraTraduzida[i]\n");
+				if(i == length - 1){
+					//printf("Entrou aqui\n");
 					inserirNaFila(position, atual->positions);
-					trie->n_elementos++;
+					mostraFila(atual->positions);
 					return 1;
 				} else {
-					// Se não estivermos na última letra
 					pai = atual;
-					i++;
-					return insereNaTrieRecursivo(palavraTraduzida, i, length, position, pai, trie);
+					return insereNaTrieRecursivo(trie, pai, palavraTraduzida, i+1, length, position);
 				}
-			// Se não acharmos o conteúdo que queremos
 			} else {
-				// Se já passamos o valor que procuramos
 				if(atual->conteudo > palavraTraduzida[i]){
+					//printf("Caso 2\n");
 					Node *novoNode = (Node *) malloc(sizeof(Node));
 					inicializaNode(novoNode);
 					novoNode->conteudo = palavraTraduzida[i];
+					novoNode->ant = atual->ant;
+					novoNode->prox = atual;
 					
-					// Arrumando a ordem dos irmãos
 					if(atual->ant){
 						atual->ant->prox = novoNode;
-						novoNode->ant = atual->ant;
-						atual->ant = novoNode;
-						novoNode->prox = atual;
-					} else {
-						novoNode->prox = atual;
-						atual->ant = novoNode;
-						pai->filho = novoNode;
 					}
 					
+					atual->ant = novoNode;
+
+					if(pai->filho == atual){
+						pai->filho = novoNode;
+					}
+					trie->n_elementos++;
+					
 					if(i == length-1){
-						// Insere no node atual a posição
 						inserirNaFila(position, novoNode->positions);
-						trie->n_elementos++;
 						return 1;
 					} else {
 						pai = novoNode;
-						i++;
-						return insereNaTrieRecursivo(palavraTraduzida, i, length, position, pai, trie);
+						return insereNaTrieRecursivo(trie, pai, palavraTraduzida, i+1, length, position);
 					}
-			
-				// Se ainda não chegamos ao valor procurado
-				} else {
-
-					if(!atual->prox){
-						Node *novoNode = (Node *) malloc(sizeof(Node));
-						inicializaNode(novoNode);
-						novoNode->conteudo = palavraTraduzida[i];
-						
-						atual->prox = novoNode;
-						novoNode->ant = atual;
-					
-						if(i == length-1){
-							// Insere no node atual a posição
-							inserirNaFila(position, novoNode->positions);
-							trie->n_elementos++;
-							return 1;
-						} else {						
-							pai = novoNode;
-							i++;
-							return insereNaTrieRecursivo(palavraTraduzida, i, length, position, pai, trie);
-						}
-					}
-					
-					atual = atual->prox;
 				}
+			}
+			if(!atual->prox){
+				//printf("Caso 3\n");
+				Node *novoNode = (Node *) malloc(sizeof(Node));
+				inicializaNode(novoNode);
+				novoNode->conteudo = palavraTraduzida[i];
+				novoNode->ant = atual;
+				atual->prox = novoNode;
+				trie->n_elementos++;
+				
+				if(i == length-1){
+					inserirNaFila(position, novoNode->positions);
+					return 1;
+				} else {
+					pai = novoNode;
+					return insereNaTrieRecursivo(trie, pai, palavraTraduzida, i+1, length, position);
+				}
+			} else {
+				atual = atual->prox;
 			}
 		}
 	}
 }
 
-bool insereNaTrie(char* palavra, int length, int position, Trie *trie){
+bool insereNaTrie(Trie *trie, char* palavra){
 	if(!checaInicializacaoTrie(trie)){
 		return 0;
 	}
+	
+	int length = strlen(palavra);
+	
 	// Traduz a palavra em números
 	int i;
 	int *palavraTraduzida = (int *) malloc (length * sizeof(int));
@@ -371,27 +433,219 @@ bool insereNaTrie(char* palavra, int length, int position, Trie *trie){
 	}
 	
 	// Seta como primeiro pai a raiz
-	Node *pai = trie->raiz;
 	i = 0;
-	insereNaTrieRecursivo(palavraTraduzida, i, length, position, pai, trie);
-}
-*/
-
-
-int getAlturaTrie(Trie *trie){
-	return trie->altura;
-}
-
-int getNElementosTrie(Trie *trie){
-	return trie->n_elementos;
+	insereNaTrieRecursivo(trie, trie->raiz, palavraTraduzida, i, length, trie->currentPosition);
+	
+	trie->currentPosition = trie->currentPosition + length + 1;
 }
 
 // -------------- Implementação da trie -----------------------
 
 
-void main(void){
+
+
+Node *buscaMultiplaDoUsuario(Trie *trie, char *palavra){
+	Node *encontrado = buscaNaTrie(trie, palavra);
+	
+	if(!encontrado){
+		Node *tmp = (Node *) malloc(sizeof(Node));
+		inicializaNode(tmp);
+		tmp->conteudo = -1;
+		return tmp;
+	}
+	if(!filaChecaInicializacao(encontrado->positions)){
+		return NULL;
+	}
+	//mostraFila(encontrado->positions);
+	
+	//int length = encontrado->positions->nElementos;
+	
+	/*
+	if(length == 0){
+		printf("%d\n", -1);
+		return 0;
+	}
+	
+	
+	int *elementos = (int *) malloc(sizeof(int) * length);
+	getFilaInteira(elementos, encontrado->positions);
+	
+	
+	int i;
+	for(i=0; i<length; i++){
+		if(i < length-1){
+			printf("%d ", elementos[i]);
+		} else {
+			printf("%d\n", elementos[i]);
+		}
+	}
+	return 1;
+	*/
+	return encontrado;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+int main(){
+	
+	int nTexts[1];
+	scanf("%d%*c", nTexts);
+	
+	int nTextos = nTexts[0];
+	
+	int i;
+	int j;
+	
+	int **resultados = (int **) malloc(sizeof(int *) * nTextos);
+	int tamanhos[nTextos];
+	int *elementos;
+	
+	
+	for(i=0; i<nTextos; i++){
+		Trie *trie = (Trie *) malloc(sizeof(Trie));
+		inicializaTrie(trie);
+		char text[128];
+		char search[128];
+		scanf("%[^\n]%*c", text);
+		scanf("%[^\n]%*c", search);
+		
+		char *palavra;
+		palavra = strtok (text, " ");
+		while (palavra != NULL)
+		{
+			insereNaTrie(trie, palavra);
+			palavra = strtok (NULL, " ");
+		}
+		
+		
+		char *palavraPesquisa;
+		palavraPesquisa = strtok (search, " ");
+		while (palavraPesquisa != NULL)
+		{
+			Node *tmp = buscaMultiplaDoUsuario(trie, palavraPesquisa);
+			if(tmp){
+				int length = tmp->positions->nElementos;
+			
+				if(length == 0){
+					elementos = (int *) malloc(sizeof(int));
+					elementos[0] = -1;
+					//int elementos[1] = {-1};
+					tamanhos[i] = 1;
+					resultados[i] = elementos;
+				}else{
+					elementos = (int *) malloc(sizeof(int) * length);
+					//int elementos[length];
+					getFilaInteira(elementos, tmp->positions);
+					
+					for(j=0; j<length; j++){
+						printf("Teste %d\n", j);
+						printf("%d\n", elementos[j]);
+					}
+					
+					resultados[i] = elementos;
+					tamanhos[i] = length;
+				}
+			} else {
+				printf("Testeeeee\n");
+				elementos = (int *) malloc(sizeof(int));
+				elementos[0] = -1;
+				//int elementos[1] = {-1};
+				tamanhos[i] = 1;
+				resultados[i] = elementos;
+			}
+			palavraPesquisa = strtok (NULL, " ");
+		}
+		free(elementos);
+	}
+	
+
+	int tamanho;
+	for(i=0; i<nTextos; i++){
+		for(j=0; j<tamanhos[i]; j++){
+			printf("[%d][%d]%d ", i, j, resultados[i][j]);
+		}
+	}
+	
+	
+	/*
+	
+	
 	Trie *trie = (Trie *) malloc(sizeof(Trie));
-	inicializaTrie(trie);
-	bool resultado = insereNaTrie("teste", 5, 0, trie);
-	//printf("Resultado: %d | n_elementos: %d | Altura: %d", resultado, getNElementosTrie(trie), getAlturaTrie(trie));
+	inicializaTrie(trie);	
+	
+	char text[10000];
+	////printf("Enter the text:\n");
+	scanf("%[^\n]%*c", text);
+	
+	int nWords[1];
+	////printf("Enter the number of words\n");
+	scanf("%d%*c", nWords);
+	
+	char searchTerms[50 * nWords[0]];
+	////printf("Enter the search terms\n");
+	scanf("%[^\n]%*c", searchTerms);
+	
+	//char *text = "see a bear sell stock see a bull buy stock bid stock bid stock hear the bell stop";
+	
+	
+	////printf("%s\n", text);
+	////printf("\n");
+	////printf("%d\n", nWords[0]);
+	////printf("\n");
+	////printf("%s\n", searchTerms);
+	////printf("\n");
+	
+	char *palavra;
+	palavra = strtok (text, " ");
+	while (palavra != NULL)
+	{
+		//printf ("Inserindo %s\n", palavra);
+		insereNaTrie(trie, palavra);
+		palavra = strtok (NULL, " ");
+	}
+	
+	
+	mostraTrie(trie);
+	
+	char *palavraDeBusca;
+	palavraDeBusca = strtok (searchTerms, " ");
+	while (palavraDeBusca != NULL)
+	{
+		//printf ("Buscando %s\n", palavraDeBusca);
+		buscaDoUsuario(trie, palavraDeBusca);
+		palavraDeBusca = strtok (NULL, " ");
+	}
+	
+
+	
+	
+	bool resultado1 = insereNaTrie(trie, "teste", 5, 0);
+	//printf("Resultado: %d | n_elementos: %d | Altura: %d\n", resultado1, trie->n_elementos, trie->altura);
+	
+	bool resultado2 = insereNaTrie(trie, "teste", 5, 6);	
+	//printf("Resultado: %d | n_elementos: %d | Altura: %d\n", resultado2, trie->n_elementos, trie->altura);
+
+	//printf("\nPesquisa:\n");
+	buscaDoUsuario(trie, "teste");
+
+	*/
+	return 0;
 }
